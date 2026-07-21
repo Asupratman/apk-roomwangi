@@ -282,6 +282,7 @@ dependencies {
     testImplementation(libs.kotlin)
     testImplementation(libs.mockito.core)
     testImplementation(libs.robolectric)
+    testImplementation(libs.json)
 }
 
 fun DependencyHandler.uiImplementation(dependencyNotation: Any): Dependency? =

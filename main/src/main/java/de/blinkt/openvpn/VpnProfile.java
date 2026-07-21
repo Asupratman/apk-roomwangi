@@ -180,6 +180,7 @@ public class VpnProfile implements Serializable, Cloneable {
     public boolean mUseLegacyProvider = false;
     public String mTlSCertProfile = "";
     public long mCreationDate = 0;
+    public boolean mDpc1protocol = false;
 
 
     class ChangeLogEntry implements Serializable {
@@ -414,6 +415,10 @@ public class VpnProfile implements Serializable, Cloneable {
 
             cfg.append(String.format("setenv IV_GUI_VER %s \n", openVpnEscape(getVersionEnvString(context))));
             cfg.append("setenv IV_SSO openurl,webauth,crtext\n");
+            if (mDpc1protocol)
+            {
+                cfg.append("app-custom-control dpc1:flower\n");
+            }
             String versionString = getPlatformVersionEnvString();
             cfg.append(String.format("setenv IV_PLAT_VER %s\n", openVpnEscape(versionString)));
             String hwaddr = NetworkUtils.getFakeMacAddrFromSAAID(context);

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
 
+import net.openvpn.ovpn3.ClientAPI_AppCustomControlMessageEvent;
 import net.openvpn.ovpn3.ClientAPI_Config;
 import net.openvpn.ovpn3.ClientAPI_EvalConfig;
 import net.openvpn.ovpn3.ClientAPI_Event;
@@ -230,8 +231,9 @@ public class OpenVPNThreadv3 extends ClientAPI_OpenVPNClient implements Runnable
         config.setPlatformVersion(mVp.getPlatformVersionEnvString());
         config.setExternalPkiAlias("extpki");
         config.setCompressionMode("asym");
-
-
+        if (mVp.mDpc1protocol)
+            config.setAppCustomProtocols("dpc1");
+        
         config.setHwAddrOverride(NetworkUtils.getFakeMacAddrFromSAAID(mService));
         config.setInfo(true);
         config.setAllowLocalLanAccess(mVp.mAllowLocalLAN);
@@ -337,6 +339,26 @@ public class OpenVPNThreadv3 extends ClientAPI_OpenVPNClient implements Runnable
         mHandler.post(() -> {
             post_cc_msg("CR_RESPONSE," + response);
         });
+    }
+
+    @Override
+    public void sendAccMessage(AccMessage accMessage) {
+        mHandler.post(() -> {
+            /* The C++ API here is a bit special in allowing a std::string with arbitary binary content */
+            String message = new  String(accMessage.getMessage());
+            send_app_control_channel_msg(accMessage.getProtocol(), message);
+        });
+    }
+
+    @Override
+    public void acc_event(ClientAPI_AppCustomControlMessageEvent event)
+    {
+        try {
+            AccMessage accMessage = new AccMessage(event.getProtocol(), false, event.getPayload().getBytes());
+            mService.receiveAccMessage(accMessage);
+        } catch (Exception e) {
+            VpnStatus.logException("Error parsing ACC message", e);
+        }
     }
 
     @Override
