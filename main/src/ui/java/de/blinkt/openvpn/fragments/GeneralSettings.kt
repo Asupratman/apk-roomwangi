@@ -36,15 +36,6 @@ class GeneralSettings : PreferenceFragmentCompat(), Preference.OnPreferenceClick
         val devHacks = findPreference<PreferenceCategory>("device_hacks") as PreferenceCategory
         mAlwaysOnVPN = findPreference("alwaysOnVpn")!!
         mAlwaysOnVPN.onPreferenceChangeListener = this
-        val loadtun = findPreference<Preference>("loadTunModule")!!
-        if (!isTunModuleAvailable) {
-            loadtun.isEnabled = false
-            devHacks.removePreference(loadtun)
-        }
-        val cm9hack = findPreference<Preference>("useCM9Fix") as CheckBoxPreference
-        if (!cm9hack.isChecked && Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            devHacks.removePreference(cm9hack)
-        }
         val useInternalFS =
             findPreference<Preference>("useInternalFileSelector") as CheckBoxPreference
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
