@@ -88,7 +88,6 @@ public class VpnProfile implements Serializable, Cloneable {
     public static final int X509_VERIFY_TLSREMOTE_RDN_PREFIX = 4;
     public static final int AUTH_RETRY_NONE_FORGET = 0;
     public static final int AUTH_RETRY_NOINTERACT = 2;
-    public static final boolean mIsOpenVPN22 = false;
     private static final long serialVersionUID = 7085688938959334563L;
     private static final int AUTH_RETRY_NONE_KEEP = 1;
     public static final int AUTH_RETRY_INTERACT = 3;
@@ -437,8 +436,7 @@ public class VpnProfile implements Serializable, Cloneable {
 
         if (!configForOvpn3) {
             cfg.append("machine-readable-output\n");
-            if (!mIsOpenVPN22)
-                cfg.append("allow-recursive-routing\n");
+            cfg.append("allow-recursive-routing\n");
 
             // Users are confused by warnings that are misleading...
             cfg.append("ifconfig-nowarn\n");
@@ -471,12 +469,7 @@ public class VpnProfile implements Serializable, Cloneable {
             mConnectRetryMaxTime = "300";
 
 
-        if (!mIsOpenVPN22)
-            cfg.append("connect-retry ").append(mConnectRetry).append(" ").append(mConnectRetryMaxTime).append("\n");
-        else if (mIsOpenVPN22 && !mUseUdp)
-            cfg.append("connect-retry ").append(mConnectRetry).append("\n");
-
-
+        cfg.append("connect-retry ").append(mConnectRetry).append(" ").append(mConnectRetryMaxTime).append("\n");
         cfg.append("resolv-retry 60\n");
 
 
@@ -738,8 +731,7 @@ public class VpnProfile implements Serializable, Cloneable {
         if (mPersistTun) {
             cfg.append("persist-tun\n");
             cfg.append("# persist-tun also enables pre resolving to avoid DNS resolve problem\n");
-            if (!mIsOpenVPN22)
-                cfg.append("preresolve\n");
+            cfg.append("preresolve\n");
         }
 
         if (mPushPeerInfo)
@@ -747,7 +739,7 @@ public class VpnProfile implements Serializable, Cloneable {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean usesystemproxy = prefs.getBoolean("usesystemproxy", true);
-        if (usesystemproxy && !mIsOpenVPN22 && !configForOvpn3 && !usesExtraProxyOptions()) {
+        if (usesystemproxy && !configForOvpn3 && !usesExtraProxyOptions()) {
             cfg.append("# Use system proxy setting\n");
             cfg.append("management-query-proxy\n");
         }
