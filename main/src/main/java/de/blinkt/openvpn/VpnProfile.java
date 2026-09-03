@@ -24,7 +24,6 @@ import androidx.annotation.Nullable;
 
 import android.text.TextUtils;
 import android.util.Base64;
-import android.util.Pair;
 
 import de.blinkt.openvpn.core.*;
 
@@ -37,13 +36,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PSSParameterSpec;
 import java.util.Collection;
@@ -183,7 +182,8 @@ public class VpnProfile implements Serializable, Cloneable {
     public boolean mDpc1protocol = false;
 
 
-    class ChangeLogEntry implements Serializable {
+    static class ChangeLogEntry implements Serializable {
+        @Serial
         private static final long serialVersionUID = 6032413096860917402L;
 
         public long time;
@@ -869,6 +869,7 @@ public class VpnProfile implements Serializable, Cloneable {
         }
     }
 
+    @NonNull
     @Override
     protected VpnProfile clone() throws CloneNotSupportedException {
         VpnProfile copy = (VpnProfile) super.clone();
@@ -879,6 +880,9 @@ public class VpnProfile implements Serializable, Cloneable {
             copy.mConnections[i++] = conn.clone();
         }
         copy.mAllowedAppsVpn = (HashSet<String>) mAllowedAppsVpn.clone();
+        copy.changesLog = new Vector<>();
+        copy.mVersion = 1;
+        copy.addChangeLogEntry(String.format(Locale.US, "Cloned from profile '%s', uuid '%s'", mName, getUUIDString()));
         return copy;
     }
 
