@@ -505,5 +505,7 @@
     <string name="unknown_but_secure">Unknown storage, but secure:</string>
     <string name="dpc1protocol">Enable device posture protocol</string>
     <string name="dpc1protocolsummary">Enables the dpc1 app custom control protocol to allow an OpenVPN service to perform device posture checks.</string>
+    <string name="local_network_permission">Local network permission</string>
+    <string name="local_network_permission_summary">Allows to connect to a VPN server on the local network.</string>
 
 </resources>
