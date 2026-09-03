@@ -16,6 +16,7 @@ import net.openvpn.ovpn3.ClientAPI_OpenVPNClient;
 import net.openvpn.ovpn3.ClientAPI_OpenVPNClientHelper;
 import net.openvpn.ovpn3.ClientAPI_ProvideCreds;
 import net.openvpn.ovpn3.ClientAPI_Status;
+import net.openvpn.ovpn3.ClientAPI_StringVec;
 import net.openvpn.ovpn3.ClientAPI_TransportStats;
 import net.openvpn.ovpn3.DnsAddress;
 import net.openvpn.ovpn3.DnsDomain;
@@ -27,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.Vector;
 
 import de.blinkt.openvpn.R;
 import de.blinkt.openvpn.VpnProfile;
@@ -315,7 +317,6 @@ public class OpenVPNThreadv3 extends ClientAPI_OpenVPNClient implements Runnable
     @Override
     public boolean socket_protect(int socket, String remote, boolean ipv6) {
         return mService.protect(socket);
-
     }
 
     @Override
@@ -332,7 +333,6 @@ public class OpenVPNThreadv3 extends ClientAPI_OpenVPNClient implements Runnable
     @Override
     public void setPauseCallback(PausedStateCallback callback) {
     }
-
 
     @Override
     public void sendCRResponse(String response) {
@@ -403,12 +403,29 @@ public class OpenVPNThreadv3 extends ClientAPI_OpenVPNClient implements Runnable
 
     @Override
     public net.openvpn.ovpn3.ClientAPI_StringVec tun_builder_get_local_networks(boolean ipv6) {
-
         net.openvpn.ovpn3.ClientAPI_StringVec nets = new net.openvpn.ovpn3.ClientAPI_StringVec();
-        for (String net : NetworkUtils.getLocalNetworks(mService, ipv6))
-            nets.add(net);
-        return nets;
+
+        if (ipv6) {
+            nets.addAll(NetworkUtils.getLocalNetworks(mService, ipv6));
+            return nets;
+        }
+        else {
+            /* IPv4 case, need to normalise network to netIP/prefix_len */
+            for (String net : NetworkUtils.getLocalNetworks(mService, false)) {
+                String[] netparts = net.split("/");
+                String ipAddr = netparts[0];
+                int netMask = Integer.parseInt(netparts[1]);
+
+
+                CIDRIP cidrip = new CIDRIP(ipAddr, netMask);
+                cidrip.normalise();
+                nets.add(cidrip.toString());
+            }
+            return nets;
+        }
     }
+
+
 
     @Override
     public boolean pause_on_connection_timeout() {
