@@ -9,9 +9,7 @@ import org.gradle.api.tasks.TaskProvider
 
 plugins {
     alias(libs.plugins.android.application)
-    id("checkstyle")
 }
-
 
 fun obtainTestBuildType(): String {
     var result = "debug";
@@ -70,27 +68,24 @@ android {
     signingConfigs {
         create("release") {
             // ~/.gradle/gradle.properties
-            val keystoreFile: String? by project
+            val keystoreFile: String? = project.findProperty("keystoreFile")?.toString()
             storeFile = keystoreFile?.let { file(it) }
-            val keystorePassword: String? by project
-            storePassword = keystorePassword
-            val keystoreAliasPassword: String? by project
-            keyPassword = keystoreAliasPassword
-            val keystoreAlias: String? by project
-            keyAlias = keystoreAlias
+            storePassword = project.findProperty("keystorePassword")?.toString()
+            keyPassword = project.findProperty("keystoreAliasPassword")?.toString()
+            keyAlias = project.findProperty("keystoreAlias")?.toString()
             enableV1Signing = true
             enableV2Signing = true
         }
 
         create("releaseOvpn2") {
             // ~/.gradle/gradle.properties
-            val keystoreO2File: String? by project
+            val keystoreO2File: String? = project.findProperty("keystoreO2File")?.toString()
             storeFile = keystoreO2File?.let { file(it) }
-            val keystoreO2Password: String? by project
+            val keystoreO2Password: String? = project.findProperty("keystoreO2Password")?.toString()
             storePassword = keystoreO2Password
-            val keystoreO2AliasPassword: String? by project
+            val keystoreO2AliasPassword: String? = project.findProperty("keystoreO2AliasPassword")?.toString()
             keyPassword = keystoreO2AliasPassword
-            val keystoreO2Alias: String? by project
+            val keystoreO2Alias: String? = project.findProperty("keystoreO2Alias")?.toString()
             keyAlias = keystoreO2Alias
             enableV1Signing = true
             enableV2Signing = true
@@ -172,13 +167,13 @@ android {
     bundle {
         codeTransparency {
             signing {
-                val keystoreTPFile: String? by project
+                val keystoreTPFile: String? = project.findProperty("keystoreTPFile")?.toString()
                 storeFile = keystoreTPFile?.let { file(it) }
-                val keystoreTPPassword: String? by project
+                val keystoreTPPassword: String? = project.findProperty("keystoreTPPassword")?.toString()
                 storePassword = keystoreTPPassword
-                val keystoreTPAliasPassword: String? by project
+                val keystoreTPAliasPassword: String? = project.findProperty("keystoreTPAliasPassword")?.toString()
                 keyPassword = keystoreTPAliasPassword
-                val keystoreTPAlias: String? by project
+                val keystoreTPAlias: String?= project.findProperty("keystoreTPAlias")?.toString()
                 keyAlias = keystoreTPAlias
 
                 if (keystoreTPFile?.isEmpty()
