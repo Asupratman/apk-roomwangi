@@ -745,7 +745,7 @@ public class VpnProfile implements Serializable, Cloneable {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean usesystemproxy = prefs.getBoolean("usesystemproxy", true);
-        if (usesystemproxy && !configForOvpn3 && !usesExtraProxyOptions()) {
+        if ((usesystemproxy || usesProxyOptions()) && !configForOvpn3 && !usesExtraProxyOptions()) {
             cfg.append("# Use system proxy setting\n");
             cfg.append("management-query-proxy\n");
         }
@@ -1406,6 +1406,17 @@ public class VpnProfile implements Serializable, Cloneable {
 
         return false;
     }
+
+    private boolean usesProxyOptions() {
+        if (mUseCustomConfig && mCustomConfigOptions != null && mCustomConfigOptions.contains("http-proxy-option "))
+            return true;
+        for (Connection c : mConnections)
+            if (c.usesProxyOptions())
+                return true;
+
+        return false;
+    }
+
 
     /**
      * The order of elements is important!

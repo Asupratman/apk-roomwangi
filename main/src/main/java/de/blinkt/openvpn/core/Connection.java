@@ -61,7 +61,7 @@ public class Connection implements Serializable, Cloneable {
         if (!isOpenVPN3)
             cfg += getHttpProxySettings(false);
 
-        if (usesExtraProxyOptions() && mProxyType == ProxyType.SOCKS5) {
+        if (usesProxyOptions() && mProxyType == ProxyType.SOCKS5) {
             cfg+=String.format(Locale.US,"socks-proxy %s %s\n", mProxyName, mProxyPort);
         }
 
@@ -85,9 +85,12 @@ public class Connection implements Serializable, Cloneable {
             return "";
         }
     }
-
     public boolean usesExtraProxyOptions() {
         return (mUseCustomConfig && mCustomConfiguration.contains("http-proxy-option "));
+    }
+
+    public boolean usesProxyOptions() {
+        return usesExtraProxyOptions() || mProxyType != ProxyType.NONE;
     }
 
 
