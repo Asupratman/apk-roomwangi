@@ -507,5 +507,6 @@
     <string name="dpc1protocolsummary">Enables the dpc1 app custom control protocol to allow an OpenVPN service to perform device posture checks.</string>
     <string name="local_network_permission">Local network permission</string>
     <string name="local_network_permission_summary">Allows to connect to a VPN server on the local network.</string>
+    <string name="openvpn3_different_proxy">OpenVPN 3 C++ implementation does not support different proxy settings per remote</string>
 
 </resources>

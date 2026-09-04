@@ -483,7 +483,7 @@ public class VpnProfile implements Serializable, Cloneable {
             cfg.append(mConnections[0].getConnectionBlock(configForOvpn3));
         } else {
             for (Connection conn : mConnections) {
-                canUsePlainRemotes = canUsePlainRemotes && conn.isOnlyRemote();
+                canUsePlainRemotes = canUsePlainRemotes && conn.isOnlyRemote(configForOvpn3);
             }
 
             if (mRemoteRandom)
@@ -496,6 +496,12 @@ public class VpnProfile implements Serializable, Cloneable {
                     }
                 }
             }
+        }
+        if (configForOvpn3 && mConnections.length >= 1){
+            /* OpenVPN 3 also supports proxy options as global config options, use the ones
+             * from the first entry since we refuse generating config if they are not all
+             * identical */
+            cfg.append(mConnections[0].getHttpProxySettings(true));
         }
 
 
@@ -764,7 +770,6 @@ public class VpnProfile implements Serializable, Cloneable {
             }
         }
 
-
         return cfg.toString();
     }
 
@@ -1019,6 +1024,22 @@ public class VpnProfile implements Serializable, Cloneable {
         return checkProfile(c, doUseOpenVPN3(c));
     }
 
+    private boolean proxySettingsIdentical()
+    {
+        if (mConnections.length <= 1)
+        {
+            return true;
+        }
+
+        String proxy = mConnections[0].getHttpProxySettings(true);
+        for (Connection conn: mConnections)
+        {
+            if (!proxy.equals(conn.getHttpProxySettings(true)))
+                return false;
+        }
+        return true;
+    }
+
     //! Return an error if something is wrong
     public int checkProfile(Context context, boolean useOpenVPN3) {
         if (mAuthenticationType == TYPE_KEYSTORE || mAuthenticationType == TYPE_USERPASS_KEYSTORE || mAuthenticationType == TYPE_EXTERNAL_APP) {
@@ -1095,6 +1116,11 @@ public class VpnProfile implements Serializable, Cloneable {
                         || (mCompatMode > 0 && mCompatMode < 20500)
                         && cipher.equals("BF-CBC"))) {
             return R.string.bf_cbc_requires_legacy;
+        }
+
+        if (!proxySettingsIdentical() && useOpenVPN3)
+        {
+            return R.string.openvpn3_different_proxy;
         }
 
         // Everything okay
